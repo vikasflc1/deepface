@@ -113,6 +113,7 @@ def load_image(img):
     # This causes troubles when reading files with non english names
     # return cv2.imread(img)
 
+
 # --------------------------------------------------
 
 
@@ -166,7 +167,12 @@ def extract_faces(
     if len(face_objs) == 0 and enforce_detection is False:
         face_objs = [(img, img_region, 0)]
 
-    for current_img, current_region, confidence in face_objs:
+    for i in face_objs:
+        if detector_backend == "retinaface":
+            current_img, current_region, confidence, landmarks = i
+        else:
+            current_img, current_region, confidence = i
+
         if current_img.shape[0] > 0 and current_img.shape[1] > 0:
             if grayscale is True:
                 current_img = cv2.cvtColor(current_img, cv2.COLOR_BGR2GRAY)
@@ -225,6 +231,10 @@ def extract_faces(
             }
 
             extracted_face = [img_pixels, region_obj, confidence]
+
+            if detector_backend == "retinaface":
+                extracted_face.append(landmarks)
+
             extracted_faces.append(extracted_face)
 
     if len(extracted_faces) == 0 and enforce_detection == True:
